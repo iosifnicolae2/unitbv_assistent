@@ -1,0 +1,24 @@
+2016-09-06T17:26:15.662+0000 I CONTROL  [initandlisten] MongoDB starting : pid=9 port=27017 dbpath=/server/data/db 64-bit host=af5800fbf248
+2016-09-06T17:26:15.662+0000 I CONTROL  [initandlisten] db version v3.2.9
+2016-09-06T17:26:15.662+0000 I CONTROL  [initandlisten] git version: 22ec9e93b40c85fc7cae7d56e7d6a02fd811088c
+2016-09-06T17:26:15.662+0000 I CONTROL  [initandlisten] OpenSSL version: OpenSSL 1.0.2g-fips  1 Mar 2016
+2016-09-06T17:26:15.662+0000 I CONTROL  [initandlisten] allocator: tcmalloc
+2016-09-06T17:26:15.662+0000 I CONTROL  [initandlisten] modules: none
+2016-09-06T17:26:15.662+0000 I CONTROL  [initandlisten] build environment:
+2016-09-06T17:26:15.662+0000 I CONTROL  [initandlisten]     distmod: ubuntu1604
+2016-09-06T17:26:15.662+0000 I CONTROL  [initandlisten]     distarch: x86_64
+2016-09-06T17:26:15.662+0000 I CONTROL  [initandlisten]     target_arch: x86_64
+2016-09-06T17:26:15.662+0000 I CONTROL  [initandlisten] options: { config: "/server/conf/mongod.conf", net: { bindIp: "0.0.0.0", port: 27017 }, processManagement: { fork: true, pidFilePath: "/var/run/mongodb/mongod.pid" }, storage: { dbPath: "/server/data/db", journal: { enabled: true } }, systemLog: { destination: "file", logAppend: false, path: "/server/log/mongodb.log" } }
+2016-09-06T17:26:15.685+0000 I -        [initandlisten] Detected data files in /server/data/db created by the 'wiredTiger' storage engine, so setting the active storage engine to 'wiredTiger'.
+2016-09-06T17:26:15.686+0000 W -        [initandlisten] Detected unclean shutdown - /server/data/db/mongod.lock is not empty.
+2016-09-06T17:26:15.686+0000 W STORAGE  [initandlisten] Recovering data from the last clean checkpoint.
+2016-09-06T17:26:15.686+0000 I STORAGE  [initandlisten] wiredtiger_open config: create,cache_size=6G,session_max=20000,eviction=(threads_max=4),config_base=false,statistics=(fast),log=(enabled=true,archive=true,path=journal,compressor=snappy),file_manager=(close_idle_time=100000),checkpoint=(wait=60,log_size=2GB),statistics_log=(wait=0),
+2016-09-06T17:26:15.941+0000 I CONTROL  [initandlisten] ** WARNING: You are running this process as the root user, which is not recommended.
+2016-09-06T17:26:15.941+0000 I CONTROL  [initandlisten] 
+2016-09-06T17:26:15.941+0000 I CONTROL  [initandlisten] 
+2016-09-06T17:26:15.941+0000 I CONTROL  [initandlisten] ** WARNING: /sys/kernel/mm/transparent_hugepage/enabled is 'always'.
+2016-09-06T17:26:15.941+0000 I CONTROL  [initandlisten] **        We suggest setting it to 'never'
+2016-09-06T17:26:15.941+0000 I CONTROL  [initandlisten] 
+2016-09-06T17:26:15.941+0000 I CONTROL  [initandlisten] ** WARNING: /sys/kernel/mm/transparent_hugepage/defrag is 'always'.
+2016-09-06T17:26:15.941+0000 I CONTROL  [initandlisten] **        We suggest setting it to 'never'
+2016-09-06T17:26:15.941+0000 I CONTROL  [initandlisten] 

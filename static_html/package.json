@@ -1,0 +1,33 @@
+{
+  "name": "unitbv-assistant",
+  "version": "0.0.0",
+  "private": true,
+  "scripts": {
+    "start": "gulp"
+  },
+  "dependencies": {
+    "bcryptjs": "^2.4.3",
+    "bluebird": "^3.5.0",
+    "body-parser": "~1.16.0",
+    "connect-redis": "^3.2.0",
+    "cookie-parser": "~1.4.3",
+    "csvtojson": "^1.1.4",
+    "debug": "~2.6.0",
+    "ejs": "~2.5.5",
+    "express": "~4.14.1",
+    "express-session": "^1.15.1",
+    "mongoose": "^4.8.6",
+    "morgan": "~1.7.0",
+    "passport": "^0.3.2",
+    "passport-facebook": "^2.1.1",
+    "passport-local": "^1.0.0",
+    "request": "^2.80.0",
+    "serve-favicon": "~2.3.2",
+    "shortid": "^2.2.8"
+  },
+  "devDependencies": {
+    "gulp": "^3.9.1",
+    "browser-sync": "^1.3.3",
+    "gulp-nodemon": "^1.0.4"
+  }
+}
