@@ -217,7 +217,7 @@ function sendOrarMessage(recipientId, messageText ,user) {
 
 var orar_string = 'Orarul dumneavoastra de astazi este: \n' ;
   if(afiseaza_luni){
-    saptamana_para=!saptamana_para;
+  //  saptamana_para=!saptamana_para;
     orar_string = 'Iti afisam orarul de luni: \n';
     zi = 1;
   }
@@ -230,11 +230,11 @@ var orar_string = 'Orarul dumneavoastra de astazi este: \n' ;
     orar_string = 'Orarul dumneavoastra din ziua de '+zile_string[zi]+' este:\n';
   }
   Orar.getOrarGrupa(user.grupa.slice(0, -1),user.grupa[user.grupa.length-1],saptamana_para,function(err,data){
-
+console.log("Afisam orarul pentru: ",zi,zile[zi],data)
 if(typeof data!='undefined')
   for(let i=1;i<8;i++)
   if(typeof data[zile[zi]+i]!='undefined'&&data[zile[zi]+i].replace(/\s/g, '').length>0){
-        orar_string+=intervale_zile[i]+" -> "+data['l'+i]+"\n";
+        orar_string+=intervale_zile[i]+" -> "+data[zile[zi]+i]+"\n";
   }else{
     orar_string+=intervale_zile[i]+" -> "+'FREE\n'
   }
@@ -255,19 +255,109 @@ if(typeof data!='undefined')
 var user_setups = [] ;
 function setup_user(recipientId,step = 0,u=null,value = null) {
   console.log("Setup user ",recipientId,step)
-  var text;
+  var messageData = {
+    recipient: {
+      id: recipientId
+    },
+    message: {
+      text: ''
+    }
+  };
 
   switch(step){
     case 0:
-    text = 'Introduceti username-ul dumneavoastra: '
+    messageData.message.text = 'Introduceti username-ul dumneavoastra: '
     break;
       case 1:
       user_setups[u].username = value;
-      text = 'Introduceti grupa si semigrupa dumneavoastra(Ex: 4LF441B): '
+      messageData.message.text = "Tastati Departamentul ( et, aia, iec, etti, calc, ti, ro,sati, seci, sea, ea, tstc)";
       break;
+        case 2:
+
+        user_setups[u].studiu = "L";
+
+        let dep_id = 0;
+        switch (value) {
+        case "et":
+            dep_id = 1;
+        break;
+        case "aia":
+            dep_id = 4;
+        break;
+        case "iec":
+            dep_id = 5;
+        break;
+        case "etti":
+            dep_id = 6;
+        break;
+        case "calc":
+            dep_id = 9;
+        break;
+        case "ti":
+            dep_id = 3;
+        break;
+        case "ro":
+            dep_id = 8;
+        break;
+        case "sati":
+            dep_id = 7;
+            user_setups[u].studiu = "M";
+
+        break;
+        case "seci":
+            dep_id = 7;
+            user_setups[u].studiu = "M";
+
+        break;
+        case "sea":
+            dep_id = 7;
+            user_setups[u].studiu = "m";
+
+        break;
+        case "ea":
+            dep_id = 2;
+        break;
+        case "tstc":
+            dep_id = 6;
+        break;
+
+        }
+        user_setups[u].departament = dep_id;
+        messageData.message.text = "Tastati Anul dumneavoastra:";
+        break;
+
+        case 3:
+          user_setups[u].an = value;
+          messageData.message.text = "Tastati Grupa:";
+        break;
+        case 4:
+          user_setups[u].grupa = value;
+          messageData.message.text = "Tastati Semigrupa (a,b):";
+        break;
       default:
-      console.log("default setup completed",user_setups[u]);
-      user_setups[u].grupa = value;
+        user_setups[u].semigrupa = value;
+
+        var zz = new Date(), year = 0;
+        if(zz.getMonth()<10){
+          year = (zz.getYear() % 10)- user_setups[u].an;
+        }else{
+          year = (zz.getYear() % 10)- user_setups[u].an+1;
+
+        }
+
+//todo ar trebui verificat mai mult urmatorul cod..
+        var zz = new Date(), year = 0;
+        if(zz.getMonth()<10){
+          year = (zz.getYear() % 10)- user_setups[u].an;
+        }else{
+          year = (zz.getYear() % 10)- user_setups[u].an+1;
+        }
+
+        console.log("default setup completed",user_setups[u]);
+
+        user_setups[u].grupa = "4"+user_setups[u].studiu+"F"+user_setups[u].departament+year+user_setups[u].grupa+user_setups[u].semigrupa.toUpperCase();
+        console.log("default setup completed2",user_setups[u]);
+
       student.update_user(user_setups[u],update_user_callback);
       console.log("user_setups initial",user_setups);
       user_setups.splice(u, 1);
@@ -275,16 +365,9 @@ function setup_user(recipientId,step = 0,u=null,value = null) {
       break;
   }
 
-console.log("setup process ",user_setups[u]," text: ",text)
-  var messageData = {
-    recipient: {
-      id: recipientId
-    },
-    message: {
-      text: text
-    }
-  };
-if(text&&text.length>0)
+//console.log("setup process ",user_setups[u]," text: ",text)
+
+if(messageData.message.text&&messageData.message.text.length>0||typeof messageData.message.attachment!='undefined')
     callSendAPI(messageData);
 }
 
@@ -377,50 +460,50 @@ function receivedPostback(event) {
   sendTextMessage(senderID, "Postback called");
 }
 
-function sendGenericMessage(recipientId) {
-  var messageData = {
-    recipient: {
-      id: recipientId
-    },
-    message: {
-      attachment: {
-        type: "template",
-        payload: {
-          template_type: "generic",
-          elements: [{
-            title: "rift",
-            subtitle: "Next-generation virtual reality",
-            item_url: "https://www.oculus.com/en-us/rift/",
-            image_url: "http://messengerdemo.parseapp.com/img/rift.png",
-            buttons: [{
-              type: "web_url",
-              url: "https://www.oculus.com/en-us/rift/",
-              title: "Open Web URL"
-            }, {
-              type: "postback",
-              title: "Call Postback",
-              payload: "Payload for first bubble",
-            }],
-          }, {
-            title: "touch",
-            subtitle: "Your Hands, Now in VR",
-            item_url: "https://www.oculus.com/en-us/touch/",
-            image_url: "http://messengerdemo.parseapp.com/img/touch.png",
-            buttons: [{
-              type: "web_url",
-              url: "https://www.oculus.com/en-us/touch/",
-              title: "Open Web URL"
-            }, {
-              type: "postback",
-              title: "Call Postback",
-              payload: "Payload for second bubble",
-            }]
-          }]
-        }
-      }
-    }
-  };
-
-  callSendAPI(messageData);
-}
+// function sendGenericMessage(recipientId) {
+//   var messageData = {
+//     recipient: {
+//       id: recipientId
+//     },
+//     message: {
+//       attachment: {
+//         type: "template",
+//         payload: {
+//           template_type: "generic",
+//           elements: [{
+//             title: "rift",
+//             subtitle: "Next-generation virtual reality",
+//             item_url: "https://www.oculus.com/en-us/rift/",
+//             image_url: "http://messengerdemo.parseapp.com/img/rift.png",
+//             buttons: [{
+//               type: "web_url",
+//               url: "https://www.oculus.com/en-us/rift/",
+//               title: "Open Web URL"
+//             }, {
+//               type: "postback",
+//               title: "Call Postback",
+//               payload: "Payload for first bubble",
+//             }],
+//           }, {
+//             title: "touch",
+//             subtitle: "Your Hands, Now in VR",
+//             item_url: "https://www.oculus.com/en-us/touch/",
+//             image_url: "http://messengerdemo.parseapp.com/img/touch.png",
+//             buttons: [{
+//               type: "web_url",
+//               url: "https://www.oculus.com/en-us/touch/",
+//               title: "Open Web URL"
+//             }, {
+//               type: "postback",
+//               title: "Call Postback",
+//               payload: "Payload for second bubble",
+//             }]
+//           }]
+//         }
+//       }
+//     }
+//   };
+//
+//   callSendAPI(messageData);
+// }
 module.exports = router;
