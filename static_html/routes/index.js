@@ -132,6 +132,7 @@ function process_message(messageText,senderID,messageAttachments,user){
         return sendMessageGrupa(senderID,messageText,user);
       }
 
+          sendTextMessage(senderID, "Interesanta comanda..");
         sendTextMessage(senderID, "Imi pare rau. Aceasta comanda nu imi este cunoscuta.😞\nScrie  ajut  ca sa ma inveti ce inseamna aceasta comanda.");
     }
 
@@ -209,11 +210,11 @@ function sendOrarMessage(recipientId, messageText ,user) {
   if(dif2<0){
     //sem2_1
     //TODO vezi ce e prima saptamana de dupa vacanta, aici cred ca se schimba, avem vacanta o saptamana..
-      saptamana_para = new Date(dif2).getDay()%2==1;
+      saptamana_para = new Date(dif2).getDay()%2==0;
   }else{
-    saptamana_para = new Date(dif1).getDay()%2==0;
+    saptamana_para = new Date(dif1).getDay()%2==1;
   }
-
+console.log("Initial saptamana este ",saptamana_para)
 
 var orar_string = 'Orarul dumneavoastra de astazi este: \n' ;
   if(afiseaza_luni){
@@ -225,12 +226,13 @@ var orar_string = 'Orarul dumneavoastra de astazi este: \n' ;
     var zi_d = getDay(messageText);
     if(zi_d<zi){
       saptamana_para=!saptamana_para;
+      console.log("Afisam pentru saptamna urmatoare.")
     }
     zi = zi_d;
     orar_string = 'Orarul dumneavoastra din ziua de '+zile_string[zi]+' este:\n';
   }
   Orar.getOrarGrupa(user.grupa.slice(0, -1),user.grupa[user.grupa.length-1],saptamana_para,function(err,data){
-console.log("Afisam orarul pentru: ",zi,zile[zi],data)
+console.log("Afisam orarul pentru: ",zi,zile[zi],data," saptaman : ",saptamana_para)
 if(typeof data!='undefined')
   for(let i=1;i<8;i++)
   if(typeof data[zile[zi]+i]!='undefined'&&data[zile[zi]+i].replace(/\s/g, '').length>0){
@@ -337,13 +339,6 @@ function setup_user(recipientId,step = 0,u=null,value = null) {
       default:
         user_setups[u].semigrupa = value;
 
-        var zz = new Date(), year = 0;
-        if(zz.getMonth()<10){
-          year = (zz.getYear() % 10)- user_setups[u].an;
-        }else{
-          year = (zz.getYear() % 10)- user_setups[u].an+1;
-
-        }
 
 //todo ar trebui verificat mai mult urmatorul cod..
         var zz = new Date(), year = 0;
