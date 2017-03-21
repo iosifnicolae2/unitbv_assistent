@@ -22,7 +22,10 @@ module.exports = {
         done(null,elm);
       //  console.log(JSON.stringify(elm)," num: ");
     })
-    .catch(done)
+    .catch(function(err){
+        console.error(err);
+        done(err);
+    })
 
   },
   getStudents:function(done){
@@ -30,6 +33,7 @@ module.exports = {
       done(false,docs);
     })
     .catch(function(err) {
+      console.error(err);
       done(err);
     });
   },
@@ -38,7 +42,8 @@ module.exports = {
       done(false,docs);
     })
     .catch(function(err) {
-      done(err);
+        console.error(err);
+        done(err);
     });
   },
     getStudent:function(uid,done){
@@ -46,7 +51,7 @@ module.exports = {
         done(false,docs);
       })
       .catch(function(err) {
-        console.log(err);
+        console.error(err);
         done(err);
       });
     },

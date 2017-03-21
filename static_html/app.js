@@ -26,7 +26,8 @@ var admin = require('./routes/admin');
 
 var app = express();
 
-
+var schedule_manager = require('./module/schedule_manager');
+schedule_manager();
 
 
 //mongoose.Promise = global.Promise;

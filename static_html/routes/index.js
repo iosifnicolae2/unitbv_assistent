@@ -189,9 +189,16 @@ function getDay(messageText){
 
 }
 
+function sendOrarSchedule(){
+  student.getStudents(function(err,students){
+    for(let i=0;i<students.length;i++)
+    setTimeout((function(){
+      sendOrarMessage(students[i].fb_id,"",students[i],"Buna dimineata")
+    }).bind(null,i,students),0);
+  })
+}
 
-
-function sendOrarMessage(recipientId, messageText ,user) {
+function sendOrarMessage(recipientId, messageText ,user,welcome_message) {
 
 
   var date = new Date();
@@ -240,6 +247,8 @@ if(typeof data!='undefined')
   }else{
     orar_string+=intervale_zile[i]+" -> "+'FREE\n'
   }
+
+orar_string = "Buna dimineata. \n" + orar_string;
 
     var messageData = {
       recipient: {
@@ -502,3 +511,4 @@ function receivedPostback(event) {
 //   callSendAPI(messageData);
 // }
 module.exports = router;
+module.exports.sendOrarSchedule = sendOrarSchedule;
