@@ -247,8 +247,8 @@ if(typeof data!='undefined')
   }else{
     orar_string+=intervale_zile[i]+" -> "+'FREE\n'
   }
-
-orar_string = "Buna dimineata. \n" + orar_string;
+if(welcome_message)
+orar_string = welcome_message+"\n" + orar_string;
 
     var messageData = {
       recipient: {
