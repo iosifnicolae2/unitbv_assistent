@@ -1,0 +1,71 @@
+curl -X POST -H "Content-Type: application/json" -d '{
+  "setting_type" : "call_to_actions",
+  "thread_state" : "existing_thread",
+  "call_to_actions":[
+    {
+      "type":"postback",
+      "title":"Ajutor",
+      "payload":"help_payload"
+    },
+    {
+      "type":"postback",
+      "title":"Vezi orarul pentru astazi",
+      "payload":"see_schedule_today"
+    },
+    {
+      "type":"postback",
+      "title":"Vezi anunturi",
+      "payload":"see_news"
+    },
+    {
+      "type":"postback",
+      "title":"Schimba grupa",
+      "payload":"change_group"
+    },
+    {
+      "type":"web_url",
+      "title":"Autentificare",
+      "url":"https://asistent-unitbv.mailo.ml/login",
+      "webview_height_ratio": "full",
+      "messenger_extensions": true
+    }
+    }
+  ]
+}' "https://graph.facebook.com/v2.6/me/thread_settings?access_token=EAAX4wjfoXawBAHg4ny3Me5KjkI5zdnZCAs7LEdZCVeHZB4liIFYKP7XCE3d55eZCtZBMagILLmZCgR3CGkeXRcW3jJwLLt4VreaLGy1On1fTx0MjCYVlFx4fliwqPk9wdj8ciQrop2ZBsJMBYhMPzzoYEyJGXZCq72zZB0ZAvMJhj23wZDZD"    
+
+
+
+curl -X POST -H "Content-Type: application/json" -d '{
+  "setting_type":"greeting",
+  "greeting":{
+    "text":"Bine ai venit {{user_first_name}}."
+  }
+}' "https://graph.facebook.com/v2.6/me/thread_settings?access_token=EAAX4wjfoXawBAHg4ny3Me5KjkI5zdnZCAs7LEdZCVeHZB4liIFYKP7XCE3d55eZCtZBMagILLmZCgR3CGkeXRcW3jJwLLt4VreaLGy1On1fTx0MjCYVlFx4fliwqPk9wdj8ciQrop2ZBsJMBYhMPzzoYEyJGXZCq72zZB0ZAvMJhj23wZDZD"    
+
+
+
+curl -X POST -H "Content-Type: application/json" -d '{
+  "setting_type" : "domain_whitelisting",
+  "whitelisted_domains" : ["https://asistent-unitbv.mailo.ml"],
+  "domain_action_type": "add"
+}' "https://graph.facebook.com/v2.6/me/thread_settings?access_token=EAAX4wjfoXawBAHg4ny3Me5KjkI5zdnZCAs7LEdZCVeHZB4liIFYKP7XCE3d55eZCtZBMagILLmZCgR3CGkeXRcW3jJwLLt4VreaLGy1On1fTx0MjCYVlFx4fliwqPk9wdj8ciQrop2ZBsJMBYhMPzzoYEyJGXZCq72zZB0ZAvMJhj23wZDZD"
+
+
+
+
+
+curl -X POST -H "Content-Type: application/json" -d '{
+  "setting_type":"call_to_actions",
+  "thread_state":"new_thread",
+  "call_to_actions":[
+    {
+      "payload":"first_seen_user"
+    }
+  ]
+}' "https://graph.facebook.com/v2.6/me/thread_settings?access_token=EAAX4wjfoXawBAHg4ny3Me5KjkI5zdnZCAs7LEdZCVeHZB4liIFYKP7XCE3d55eZCtZBMagILLmZCgR3CGkeXRcW3jJwLLt4VreaLGy1On1fTx0MjCYVlFx4fliwqPk9wdj8ciQrop2ZBsJMBYhMPzzoYEyJGXZCq72zZB0ZAvMJhj23wZDZD"      
+
+
+
+
+
+

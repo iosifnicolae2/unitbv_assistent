@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <title>Admin Groups</title>
+    <% include head %>
+  </head>
+
+  <body>
+  <% include navbar %>
+
+
+<div class="container">
+<% if(typeof error!='undefined'){%><%-JSON.stringify(error) %><%}%>
+<% if(typeof intervals!='undefined'){%><%-JSON.stringify(intervals) %><%}%>
+</div>
+
+    <footer class="footer">
+      <div class="container">
+        <p class="text-muted">Place sticky footer content here.</p>
+      </div>
+    </footer>
+
+
+    <% include scripts %>
+  </body>
+</html>

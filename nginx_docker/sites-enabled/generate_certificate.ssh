@@ -1,0 +1,9 @@
+#!/bin/sh
+openssl req \
+       -newkey rsa:2048 -nodes -keyout devart.key \
+       -x509 -days 365 -out devart.crt
+
+openssl req \
+       -key devart.key \
+       -new \
+       -x509 -days 365 -out devart.crt

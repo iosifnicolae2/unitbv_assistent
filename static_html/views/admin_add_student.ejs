@@ -1,0 +1,304 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <title>Admin Add student</title>
+    <% include head %>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-select/1.12.2/css/bootstrap-select.min.css">
+    <style>
+    .tagging {
+      border: 1px solid #afafaf;
+          cursor: text;
+          font-size: 1em;
+          width: 500px;
+          height: auto;
+          min-height: 30px;
+          border-radius: 3px;
+          background: white;
+          box-shadow: inset 0 3px 5px rgba(0,0,0,0.5);
+          -webkit-box-shadow: inset 0 1px 1px rgba(0,0,0,.075);
+          -moz-box-shadow: inset 0 1px 1px rgba(0,0,0,.075);
+          -ms-box-shadow: inset 0 1px 1px rgba(0,0,0,.075);
+}
+.tag {
+    background: none repeat scroll 0 0 #5C5752;
+    border-radius: 2px;
+    color: white;
+    cursor: default;
+    display: inline-block;
+    position: relative;
+    white-space: nowrap;
+    padding: 4px 22px 4px 10px;
+    margin: 4px;
+}
+.tag .tag-i {
+    color: white;
+    cursor: pointer;
+    font-size: 1em;
+    height: 0;
+    position: absolute;
+    right: 5px;
+    text-align: center;
+    width: 10px;
+    text-decoration: none;
+}
+.type-zone {
+  height: 28px;
+      width: auto;
+      min-width: 60px;
+      display: inline-block;
+      padding: 2px 5px;
+      margin-left: 5px;
+       background-color: #e6e6e6;
+
+}
+</style>
+  </head>
+
+  <body>
+  <% include navbar %>
+
+
+
+  username: String,
+  password: String,
+   grupa: String,
+   details: {
+     name:String,
+     email:String,
+     unique_id:String
+   },
+   notifications : {
+     //here we will store unique_id of different notifications
+     whitelist:[String],
+     blacklist:[String],
+   },
+   facebook:{
+     id:String,
+     token:String,
+     name:String,
+     email:String
+   }
+   <div class="container">
+
+     <h3 style="margin-bottom:30px;margin-left:30px;">Add Student</h3>
+     <form class="form-horizontal" role="form" id="admin_add_student" action="" method="post">
+          <div class="form-group">
+            <label class="col-lg-3 control-label">Full Name:</label>
+            <div class="col-lg-8">
+              <input class="form-control" type="text" name="details.name" value="<%=student.details.name||student.facebook.name%>">
+            </div>
+          </div>
+          <div class="form-group">
+            <label class="col-lg-3 control-label">Email:</label>
+            <div class="col-lg-8">
+              <input class="form-control" type="text" name="details.email" value="<%=student.details.email||student.facebook.email%>">
+            </div>
+          </div>
+          <div class="form-group">
+            <label class="col-md-3 control-label">Grupa:</label>
+            <div class="col-md-8">
+              <input class="form-control" type="text" name="grupa" value="<%=student.grupa%>">
+            </div>
+          </div>
+          <div class="form-group">
+            <label class="col-md-3 control-label">Username:</label>
+            <div class="col-md-8">
+              <input class="form-control" type="text" name="username" value="<%=student.username%>">
+            </div>
+          </div>
+          <div class="form-group">
+            <label class="col-md-3 control-label">Password:</label>
+            <div class="col-md-8">
+              <input class="form-control" name="password" type="password" value="">
+            </div>
+          </div>
+          <div class="form-group">
+            <label class="col-md-3 control-label">Confirm password:</label>
+            <div class="col-md-8">
+              <input class="form-control" name="confirm_password"type="password" value="">
+            </div>
+          </div>
+          <%if(student.notifications.whitelist!=null&&student.notifications.whitelist.length>0){%>
+            yes
+            <%=student.notifications.whitelist.join('\n')%>
+            <%}%>
+          <div class="form-group">
+              <label class="col-xs-3 control-label">Notifications whitelist</label>
+              <div class="col-md-8">
+                  <div data-name="whitelist" id="whitelist" ><%if(student.notifications.whitelist!=null&&student.notifications.whitelist.length>0){%><%=student.notifications.whitelist.join('\n')%><%}%></div>
+              </div>
+          </div>
+        <div class="form-group">
+            <label class="col-xs-3 control-label">Notifications blacklist</label>
+            <div class="col-md-8">
+                <div data-name="blacklist" id="blacklist" ><%if(student.notifications.blacklist!=null&&student.notifications.blacklist.length>0){%><%=student.notifications.blacklist.join('\n')%><%}%></div>
+            </div>
+        </div>
+          <div class="form-group">
+            <label class="col-md-3 control-label"></label>
+            <div class="col-md-8">
+              <input type="submit" class="btn btn-primary" value="Save Changes">
+              <span></span>
+              <input type="reset" class="btn btn-default" value="Cancel">
+            </div>
+          </div>
+        </form>
+
+   </div>
+
+    <footer class="footer">
+      <div class="container">
+        <p class="text-muted">Place sticky footer content here.</p>
+      </div>
+    </footer>
+
+
+    <% include scripts %>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-select/1.12.2/js/bootstrap-select.min.js"></script>
+    <script>
+    ( function( $, window, document ) {
+
+    $.fn.tagging = function(a) {
+
+        // Here we will save all tags (for reference)
+        var tags = [];
+
+        $( this ).each( function() {
+
+            var init_text, $type_zone, obj, add_tag,
+                    $this = $( this );
+
+            // Checking object length
+            if ( ! $this.length ) {
+                console.error( "%s not found", a );
+                return ;
+            }
+
+            // Init Text
+            init_text = $this.text();
+
+            // Empty the original div
+            $this.empty();
+
+            // Adding class and contenteditable attribute to the type zone
+            $type_zone = $( document.createElement( "div" ) )
+                            .addClass( "type-zone" )
+                            .attr( "contenteditable", true );
+
+            // Adding tagging class and appending the type zone
+            $this
+                .addClass( "tagging" )
+                .append( $type_zone );
+
+            obj = {
+                input_name: $this.data( "name" )
+            };
+
+            /**
+             * Simply add tag to type_zone
+             *
+             * @param string    text    Tag's text
+             */
+            add_tag = function( text ) {
+
+                if ( ! text ) {
+                    text = $type_zone.text();
+                    $type_zone.empty();
+                }
+
+                if ( ! text || ! text.length ) {
+                    return ;
+                }
+
+                var $tag = $( document.createElement("div") )
+                                .addClass( "tag" )
+                                .html( text );
+
+                // Creating and Appending hidden input
+                $( "<input/>" )
+                    .attr( "type", "hidden" )
+                    .attr( "name", obj.input_name + "[]" )
+                    .val( text )
+                    .appendTo( $tag );
+
+                // Creating and tag button (with "x" to remove tag)
+                $( "<a/>" )
+                    .attr( "role", "button" )
+                    .addClass( "tag-i" )
+                    .text( "x" )
+                    .click( function() {
+                        $tag.remove();
+                    })
+                    .appendTo( $tag );
+
+                tags.push( $tag );
+
+                // Adding tag in the type zone
+                $type_zone.before( $tag );
+            };
+
+            // Keydown event listener on type_zone
+            $type_zone.on( "keydown", function(e) {
+                var $last_tag,
+                    key = e.which;
+
+                // Enter or comma
+                if ( key === 13 || key === 188 ) {
+
+                    // Prevent Default
+                    e.preventDefault();
+
+                    // Adding tag
+                    add_tag();
+                }
+
+                // Backspace or Del
+                if ( $type_zone.text() === "" && ( key === 8 || key === 46 ) ) {
+
+                    // Prevent Default
+                    e.preventDefault();
+
+                    // Retrieve last tag
+                    $last_tag = tags.pop();
+
+                    // If there is a tag
+                    if ( $last_tag !== undefined ) {
+                        // Removing last tag
+                        $last_tag.remove();
+                    }
+
+                }
+
+            }).blur( add_tag );
+
+            $this.on( "click", function() {
+                $type_zone.focus();
+            });
+
+            // Adding text present on type_zone as tag on first call
+            $.each( init_text.split("\n"), function() {
+                add_tag( this );
+            });
+        });
+
+        // We don"t break the chain
+        return this;
+    };
+
+
+})( window.jQuery, window, document );
+
+// jQuery on Ready example
+( function( $, window, document ) {
+    $( document ).ready( function() {
+        var t = $( "#whitelist" ).tagging();
+        t.addClass( "form-control" )
+            var t2 = $( "#blacklist" ).tagging();
+            t2.addClass( "form-control" )
+    });
+})( window.jQuery, window, document );
+
+</script>
+  </body>
+</html>
