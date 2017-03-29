@@ -1,5 +1,9 @@
 var schedule = require('node-schedule');
 
+
+process.env.TZ = 'Europe/Bucharest'
+
+
 const rule = new schedule.RecurrenceRule();
 rule.hour = 7;
 rule.minute = 0;
