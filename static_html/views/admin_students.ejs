@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <title>Admin Students</title>
+    <% include head %>
+  </head>
+
+  <body>
+  <% include navbar %>
+
+
+
+    <!-- Begin page content -->
+    <div class="container">
+      <div class="page-header">
+        <h1>Students</h1>
+        <a class="btn btn-success" href="/admin/add/student" role="button">Add Student</a>
+      </div>
+      <table class="table table-striped">
+
+              <thead>
+                      <tr>
+                        <th>#</th>
+                        <th>Name</th>
+                        <th>Grupa</th>
+                        <th>Email</th>
+                        <th>Edit</th>
+                      </tr>
+                </thead>
+                    <tbody>
+                      <%for(var i=0;i<users.length;i++){%>
+                      <tr>
+                        <td><%=i%></td>
+                        <td><%=users[i].grupa%></td>
+                        <td><%=users[i].details.name||users[i].facebook.name%></td>
+                        <td><%=users[i].details.email||users[i].facebook.email%></td>
+                        <td><a class="btn btn-danger" href="/admin/edit/student/<%=users[i].id%>" role="button">Edit</a></td>
+
+                      </tr>
+                      <%}%>
+                    </tbody>
+                  </table>
+    </div>
+
+    <footer class="footer">
+      <div class="container">
+        <p class="text-muted">Place sticky footer content here.</p>
+      </div>
+    </footer>
+
+
+    <% include scripts %>
+  </body>
+</html>
