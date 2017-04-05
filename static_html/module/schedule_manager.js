@@ -10,7 +10,7 @@ date.setUTCMinutes(0);
 */
 
 const rule = new schedule.RecurrenceRule();
-rule.hour = 7;
+rule.hour = 5;
 rule.minute = 0;
 
 

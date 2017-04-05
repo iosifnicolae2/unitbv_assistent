@@ -13,7 +13,7 @@ module.exports = {
 
   },
   getOrarGrupa : function(grupa, sgr,saptamana_para,done){
-console.log("Search for: ",grupa,sgr)
+console.log("Search for: ",grupa,sgr,saptamana_para)
 
     Orar.findOne({
     grupa: grupa,

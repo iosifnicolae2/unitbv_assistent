@@ -10,7 +10,7 @@ const zile = ['','l','m','mi','j','v'];
 const intervale_zile = ['','\u0020\u00208,00-\u0020\u00209,50',	'10,00-11,50',	'12,00-13,50',	'14,00-15,50'	,'16,00-17,50'	,'18,00-19,50',	'20,00-21,50'];
 const sem2_1 = new Date(2017, 2, 27);
 const sem2_2 = new Date(2017, 4, 24);
-const zile_string = ['','Luni','Marti','Miercuri','Joi','Vineri'];
+const zile_string = ['Duminica','Luni','Marti','Miercuri','Joi','Vineri','Sambata'];
 
 /* GET home page. */
 router.get('/', function(req, res, next) {
@@ -42,11 +42,21 @@ router.get('/webhook', function (req, res) {
 
         // Iterate over each messaging event
         entry.messaging.forEach(function(event) {
+          if(event)
           if (event.message&&!event.message.is_echo) {
             console.log("Message received:  ",event);
             receivedMessage(event);
           } else {
-            //console.log("Webhook received unknown event: ", event);
+            if(event.postback){
+              var payload = event.postback.payload;
+              if(payload=='SETUP_USER'){
+              let senderID = event.sender.id;
+              user_setups.push({id:senderID,step:0});
+                return  setup_user(senderID);
+              }
+            }
+
+            console.log("Webhook received unknown event: ", event);
           }
         });
       });
@@ -76,6 +86,8 @@ router.get('/webhook', function (req, res) {
   var messageText = message.text;
   var messageAttachments = message.attachments;
 
+
+
 var u = userSetupAccount(senderID);
 if(u>=0){
   console.log("User is in setup process");
@@ -91,7 +103,7 @@ student.getStudentFb(senderID,function(err,user){
     user_setups.push({id:senderID,step:0});
       setup_user(senderID);
   }else{
-    console.log("User found: ",user);
+  //  console.log("User found: ",user);
     process_message(messageText,senderID,messageAttachments,user);
   }
 })
@@ -111,29 +123,67 @@ function process_message(messageText,senderID,messageAttachments,user){
     case 'orar':
             sendOrarMessage(senderID,false,user);
     break;
+    case 'vremea':
+            sendWeatherMessage(senderID,false,user);
+    break;
     case 'setup':
     user_setups.push({id:senderID,step:0});
             setup_user(senderID);
     break;
     case 'ajutor':
-
-          sendTextMessage(senderID, `Salut.😊\nTastati  orar  pentru a afisa orarul pentru ziua curenta.\nTastati   orar luni  pentru a afisa orarul pentru ziua de Luni.\nTastati anunt: <aici este mesajul> pentru a-ti anunta grupa de un eveniment.`);
+          sendTextMessage(senderID, `Salut.😊\nAcestea sunt comenzile disponibile pentru dumneavoastra:`,[
+              {
+                "content_type":"text",
+                "title":"setup",
+                "payload":"SETUP_PAYLOAD"
+              },{
+                "content_type":"text",
+                "title":"orar",
+                "payload":"SETUP_ORAR"
+              },{
+                "content_type":"text",
+                "title":"orar luni",
+                "payload":"SETUP_ORAR_LUNI"
+              },{
+                "content_type":"text",
+                "title":"orar maine",
+                "payload":"SETUP_ORAR_LUNI"
+              },{
+                "content_type":"text",
+                "title":"vremea",
+                "payload":"SETUP_WEATHER"
+              },{
+                "content_type":"text",
+                "title":"vremea luni",
+                "payload":"SETUP_WEATHER"
+              },{
+                "content_type":"text",
+                "title":"vremea maine",
+                "payload":"SETUP_WEATHER"
+              },{
+                "content_type":"text",
+                "title":"anunt: Salutare",
+                "payload":"ANNOUNCE_GROUP"
+              }
+            ]);
     break;
     case 'ajut':
           sendTextMessage(senderID, `Multumesc ca vrei sa ma ajuti sa ma dezvolt 😀.\nPuteti contribui implementand ideile dumneavoastra aici: https://github.com/iosifnicolae2/asistent-unitbv`);
-
     break;
 
       default:
       if(messageText.indexOf('orar')==0)
       return sendOrarMessage(senderID,messageText,user);
 
+      if(messageText.indexOf('vremea')==0)
+      return sendWeatherMessage(senderID,messageText,user);
+
       if(messageText.indexOf('anunt:')==0){
         console.log("Send anunt ",messageText)
         return sendMessageGrupa(senderID,messageText,user);
       }
 
-          sendTextMessage(senderID, "Interesanta comanda..");
+        sendTextMessage(senderID, "Interesanta comanda..");
         sendTextMessage(senderID, "Imi pare rau. Aceasta comanda nu imi este cunoscuta.😞\nScrie  ajut  ca sa ma inveti ce inseamna aceasta comanda.");
     }
 
@@ -170,6 +220,9 @@ function sendMessageGrupa(senderID,messageText,user){
 
 function getDay(messageText){
   if(messageText){
+    if(messageText.indexOf('maine')>0){
+        return (new Date().getDay()+1);
+    }
     if(messageText.indexOf('luni')>0){
         return 1;
     }
@@ -185,6 +238,12 @@ function getDay(messageText){
     if(messageText.indexOf('vineri')>0){
         return 5;
     }
+    if(messageText.indexOf('sambata')>0){
+        return 6;
+    }
+    if(messageText.indexOf('duminica')>0){
+        return 0;
+    }
   }
     return 1;
 
@@ -194,7 +253,8 @@ function sendOrarSchedule(){
   student.getStudents(function(err,students){
     for(let i=0;i<students.length;i++)
     setTimeout((function(){
-      sendOrarMessage(students[i].fb_id,"",students[i],"Buna dimineata")
+      sendOrarMessage(students[i].fb_id,"",students[i],"Buna dimineata");
+      sendWeatherMessage(students[i].fb_id,students[i])
     }).bind(null,i,students),0);
   })
 }
@@ -211,7 +271,109 @@ function getWeekNumber(d) {
     // Calculate full weeks to nearest Thursday
     var weekNo = Math.ceil(( ( (d - yearStart) / 86400000) + 1)/7);
     // Return array of year and week number
-    return [d.getFullYear(), weekNo];
+    return  weekNo;
+}
+
+var weather_data = {}, latest_update_weather;
+
+const days = ['Monday','Tuesday','Wednesday','Thursday','Friday','Saturday','Sunday'];
+
+function updateWeather(c,recipientId,day){
+  request({
+    uri: 'https://api.wunderground.com/api/0b4553f4ca1dd2ff/forecast10day/lang:RO/q/RO/Brasov.json',
+    method: 'GET'
+  }, function (error, response, body) {
+    if (!error && response.statusCode == 200) {
+      weather_data = JSON.parse(body);
+      latest_update_weather = new Date();
+      c(false,recipientId,day);
+    } else {
+      c(error);
+    }
+  });
+}
+
+
+var sendWeather_next = function(err,recipientId,day){
+
+let ddd = day;
+  var today = new Date(),is_today = false;
+  console.log("today",today);
+  if(today.getDay()==day){
+    is_today = true;
+  }
+  today.setDate(today.getDate() - today.getDay() + day );
+  day = today.getUTCDate();
+  // console.log("today",today,day);
+      if(err)
+      console.log("Error get weather api: ",err);
+      else{
+              var vremea = "";
+                var todayW = weather_data.forecast;
+
+                if(is_today){
+                  let vv = todayW.txt_forecast.forecastday[0];
+                    let wh = todayW.simpleforecast.forecastday[0];
+                  vremea+="Vremea "+vv.title+": "+  wh.low.celsius+" - "+wh.high.celsius+" °C\n"+
+                  vv.fcttext_metric+"\n\n";
+                }
+        todayW.simpleforecast.forecastday.forEach(function(wh){
+          //TODO ar trebui ca pentru maine sa incrementez ziua dar sa verifica daca e la sfarsit de luna..
+        //  console.log(value)
+          if(wh.date.day==day){
+            //console.log("-------------found simpleforecast.forecastday",wh);
+              todayW.txt_forecast.forecastday.forEach(function(vv){
+                if(vv.period == wh.period){
+                  //console.log("--------------------------found txt_forecast.forecastday",vv);
+                  vremea+="Vremea "+vv.title+": "+  wh.low.celsius+" - "+wh.high.celsius+" °C\n"+
+                  vv.fcttext_metric+"\n\n";
+
+                }
+              },this)
+
+
+          }
+
+        },this)
+
+
+
+
+        var messageData = {
+          recipient: {
+            id: recipientId
+          },
+           message: {
+            text: vremea,
+            quick_replies:[
+                {
+                      "content_type":"text",
+                      "title":"vremea "+zile_string[ddd>5||ddd==0?1:ddd+1].toLowerCase(),
+                      "payload":"SCHEDULE_NEXT_WEEK"
+                    }
+              ]
+          }
+
+        };
+
+        callSendAPI(messageData);
+      }
+}
+function sendWeatherMessage(recipientId,messageText, user) {
+  var zi = (new Date()).getDay();
+  if(messageText){
+    var zi_d = getDay(messageText);
+    if(zi_d<zi){
+      saptamana_para=!saptamana_para;
+    }
+    zi = zi_d;
+  }
+
+  if(latest_update_weather==null||((new Date()).getHours()-latest_update_weather.getHours())>2){
+    updateWeather(sendWeather_next,recipientId,zi)
+  }else{
+    sendWeather_next(false,recipientId,zi);
+  }
 }
 
 function sendOrarMessage(recipientId, messageText ,user,welcome_message) {
@@ -226,20 +388,21 @@ function sendOrarMessage(recipientId, messageText ,user,welcome_message) {
   else today =zile[date.getDay()]
 
   var saptamana_para = true;
-  var dif1 = sem2_1-date;
-  var dif2 = sem2_2-date;
+  var dif1 = date-sem2_1;
+  var dif2 = date-sem2_2;
 
 
+  console.log("dif1: ",dif1,"dif2: ",dif2,date,new Date(dif2));
   if(dif2<0){
     //sem2_1
     //TODO vezi ce e prima saptamana de dupa vacanta, aici cred ca se schimba, avem vacanta o saptamana..
-      saptamana_para = getWeekNumber(new Date(dif2))%2==0;
+      saptamana_para = getWeekNumber(date)%2==0;
+      console.log("Inainte de vacanta ",saptamana_para,getWeekNumber(date));
   }else{
-    console.log("sem 1",dif1);
-    saptamana_para = getWeekNumber(new Date(dif1))%2==1;
+    saptamana_para = getWeekNumber(date)%2==1;
+    console.log("Dupa de vacanta ",saptamana_para,getWeekNumber(date));
 
   }
-console.log("Initial saptamana este ",saptamana_para)
 
 var orar_string = 'Orarul dumneavoastra de astazi este: \n' ;
   if(afiseaza_luni){
@@ -257,7 +420,7 @@ var orar_string = 'Orarul dumneavoastra de astazi este: \n' ;
     orar_string = 'Orarul dumneavoastra din ziua de '+zile_string[zi]+' este:\n';
   }
   Orar.getOrarGrupa(user.grupa.slice(0, -1),user.grupa[user.grupa.length-1],saptamana_para,function(err,data){
-console.log("Afisam orarul pentru: ",zi,zile[zi],data," saptaman : ",saptamana_para)
+//console.log("Afisam orarul pentru: ",zi,zile[zi],data," saptaman : ",saptamana_para)
 if(typeof data!='undefined')
   for(let i=1;i<8;i++)
   if(typeof data[zile[zi]+i]!='undefined'&&data[zile[zi]+i].replace(/\s/g, '').length>0){
@@ -276,7 +439,18 @@ orar_string = welcome_message+"\n" + orar_string;
         id: recipientId
       },
       message: {
-        text: orar_string
+        text: orar_string,
+        quick_replies:[{
+              "content_type":"text",
+              "title":"vremea",
+              "payload":"SETUP_WEATHER"
+            },
+            {
+                  "content_type":"text",
+                  "title":"orar "+zile_string[zi>5||zi==0?1:zi+1].toLowerCase(),
+                  "payload":"SCHEDULE_NEXT_WEEK"
+                }
+          ]
       }
     };
 
@@ -302,7 +476,54 @@ function setup_user(recipientId,step = 0,u=null,value = null) {
     break;
       case 1:
       user_setups[u].username = value;
-      messageData.message.text = "Tastati Departamentul ( et, aia, iec, etti, calc, ti, ro,sati, seci, sea, ea, tstc)";
+      messageData.message.text = "Selectati departamentul";
+
+      messageData.message.quick_replies = [{
+            "content_type":"text",
+            "title":"et",
+            "payload":"SETUP_DEP"
+          },{
+                "content_type":"text",
+                "title":"aia",
+                "payload":"SETUP_DEP"
+          },{
+                "content_type":"text",
+                "title":"iec",
+                "payload":"SETUP_DEP"
+          },{
+                "content_type":"text",
+                "title":"etti",
+                "payload":"SETUP_DEP"
+          },{
+                "content_type":"text",
+                "title":"calc",
+                "payload":"SETUP_DEP"
+          },{
+                "content_type":"text",
+                "title":"ti",
+                "payload":"SETUP_DEP"
+          },{
+                "content_type":"text",
+                "title":"ro",
+                "payload":"SETUP_DEP"
+          },{
+                "content_type":"text",
+                "title":"sati",
+                "payload":"SETUP_DEP"
+          },{
+                "content_type":"text",
+                "title":"sea",
+                "payload":"SETUP_DEP"
+          },{
+                "content_type":"text",
+                "title":"ea",
+                "payload":"SETUP_DEP"
+          },{
+                "content_type":"text",
+                "title":"tstc",
+                "payload":"SETUP_DEP"
+          }
+        ]
       break;
         case 2:
 
@@ -355,16 +576,77 @@ function setup_user(recipientId,step = 0,u=null,value = null) {
 
         }
         user_setups[u].departament = dep_id;
-        messageData.message.text = "Tastati Anul dumneavoastra:";
+        messageData.message.text = "Selectati anul dumneavoastra:";
+        messageData.message.quick_replies = [{
+              "content_type":"text",
+              "title":"1",
+              "payload":"SETUP_AN"
+            },{
+                  "content_type":"text",
+                  "title":"2",
+                  "payload":"SETUP_AN"
+            },{
+                  "content_type":"text",
+                  "title":"3",
+                  "payload":"SETUP_AN"
+            },{
+                  "content_type":"text",
+                  "title":"4",
+                  "payload":"SETUP_AN"
+            }
+          ]
         break;
 
         case 3:
           user_setups[u].an = value;
-          messageData.message.text = "Tastati Grupa:";
+          messageData.message.text = "Selectati Grupa:";
+          messageData.message.quick_replies = [{
+                "content_type":"text",
+                "title":"I",
+                "payload":"SETUP_GRUPA"
+              },{
+                    "content_type":"text",
+                    "title":"II",
+                    "payload":"SETUP_GRUPA"
+              },{
+                    "content_type":"text",
+                    "title":"III",
+                    "payload":"SETUP_GRUPA"
+              },{
+                    "content_type":"text",
+                    "title":"IV",
+                    "payload":"SETUP_GRUPA"
+              }
+            ]
         break;
         case 4:
-          user_setups[u].grupa = value;
-          messageData.message.text = "Tastati Semigrupa (a,b):";
+        var grupa = 1;
+        switch(value){
+          case 'I':
+          grupa = 1;
+          break;
+          case 'II':
+          grupa = 2;
+          break;
+          case 'III':
+          grupa = 3;
+          break;
+          case 'IV':
+          grupa = 4;
+          break;
+        }
+          user_setups[u].grupa = grupa;
+          messageData.message.text = "Selectati semigrupa:";
+          messageData.message.quick_replies = [{
+                "content_type":"text",
+                "title":"A",
+                "payload":"SETUP_SGRUPA"
+              },{
+                    "content_type":"text",
+                    "title":"B",
+                    "payload":"SETUP_SGRUPA"
+              }
+            ]
         break;
       default:
         user_setups[u].semigrupa = value;
@@ -430,16 +712,18 @@ function userSetupAccount(user_id){
 
 
 
-function sendTextMessage(recipientId, messageText) {
+
+function sendTextMessage(recipientId, messageText,quick_replies = undefined) {
   var messageData = {
     recipient: {
       id: recipientId
     },
     message: {
-      text: messageText
+      text: messageText,
+      quick_replies:quick_replies
     }
   };
-
+  console.log("quick_replies",messageData.message)
   callSendAPI(messageData);
 }
 
@@ -468,22 +752,6 @@ function callSendAPI(messageData) {
   });
 }
 
-function receivedPostback(event) {
-  var senderID = event.sender.id;
-  var recipientID = event.recipient.id;
-  var timeOfPostback = event.timestamp;
-
-  // The 'payload' param is a developer-defined field which is set in a postback
-  // button for Structured Messages.
-  var payload = event.postback.payload;
-
-  // console.log("Received postback for user %d and page %d with payload '%s' " +
-  //   "at %d", senderID, recipientID, payload, timeOfPostback);
-
-  // When a postback is called, we'll send a message back to the sender to
-  // let them know it was successful
-  sendTextMessage(senderID, "Postback called");
-}
 
 // function sendGenericMessage(recipientId) {
 //   var messageData = {
