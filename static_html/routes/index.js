@@ -116,24 +116,12 @@ function process_message(messageText,senderID,messageAttachments,user){
             setup_user(senderID);
     break;
     case 'ajutor':
-<<<<<<< HEAD
-=======
-<<<<<<< HEAD
+
           sendTextMessage(senderID, `Salut.😊\nTastati  orar  pentru a afisa orarul pentru ziua curenta.\nTastati   orar luni  pentru a afisa orarul pentru ziua de Luni.\nTastati anunt: <aici este mesajul> pentru a-ti anunta grupa de un eveniment.`);
     break;
     case 'ajut':
           sendTextMessage(senderID, `Multumesc ca vrei sa ma ajuti sa ma dezvolt 😀.\nPuteti contribui implementand ideile dumneavoastra aici: https://github.com/iosifnicolae2/asistent-unitbv`);
-=======
->>>>>>> 8eebc6820792b7c3019cc96a35b57f044f492d17
-          sendTextMessage(senderID, `Salut.😊\nTastati orar pentru a afisa orarul pentru ziua curenta.\nTastati  orar  luni pentru a afisa orarul pentru ziua de Luni.\nTastati anunt: <aici este mesajul> pentru a-ti anunta grupa de un eveniment.`);
-    break;
-    case 'ajut':
-          sendTextMessage(senderID, `Multumesc ca vrei sa ma ajuti sa ma dezvolt 😀.\nScrie-mi un email aici: iosifnicolae2@gmail.com`);
-<<<<<<< HEAD
-=======
->>>>>>> f92d0ff36e2b2aad91f0e672fc2b594498dcd211
->>>>>>> 8eebc6820792b7c3019cc96a35b57f044f492d17
-    break;
+
     break;
 
       default:
@@ -211,9 +199,6 @@ function sendOrarSchedule(){
   })
 }
 
-<<<<<<< HEAD
-=======
-<<<<<<< HEAD
 function getWeekNumber(d) {
     // Copy date so don't modify original
     d = new Date(+d);
@@ -229,9 +214,6 @@ function getWeekNumber(d) {
     return [d.getFullYear(), weekNo];
 }
 
-=======
->>>>>>> f92d0ff36e2b2aad91f0e672fc2b594498dcd211
->>>>>>> 8eebc6820792b7c3019cc96a35b57f044f492d17
 function sendOrarMessage(recipientId, messageText ,user,welcome_message) {
 
 
@@ -251,22 +233,11 @@ function sendOrarMessage(recipientId, messageText ,user,welcome_message) {
   if(dif2<0){
     //sem2_1
     //TODO vezi ce e prima saptamana de dupa vacanta, aici cred ca se schimba, avem vacanta o saptamana..
-<<<<<<< HEAD
-      saptamana_para = new Date(dif2).getDay()%2==0;
-  }else{
-    saptamana_para = new Date(dif1).getDay()%2==1;
-=======
-<<<<<<< HEAD
       saptamana_para = getWeekNumber(new Date(dif2))%2==0;
   }else{
     console.log("sem 1",dif1);
     saptamana_para = getWeekNumber(new Date(dif1))%2==1;
-=======
-      saptamana_para = new Date(dif2).getDay()%2==0;
-  }else{
-    saptamana_para = new Date(dif1).getDay()%2==1;
->>>>>>> f92d0ff36e2b2aad91f0e672fc2b594498dcd211
->>>>>>> 8eebc6820792b7c3019cc96a35b57f044f492d17
+
   }
 console.log("Initial saptamana este ",saptamana_para)
 
@@ -294,13 +265,11 @@ if(typeof data!='undefined')
   }else{
     orar_string+=intervale_zile[i]+" -> "+'FREE\n'
   }
-<<<<<<< HEAD
 
-orar_string = "Buna dimineata. \n" + orar_string;
-=======
+
 if(welcome_message)
 orar_string = welcome_message+"\n" + orar_string;
->>>>>>> 8eebc6820792b7c3019cc96a35b57f044f492d17
+
 
     var messageData = {
       recipient: {
