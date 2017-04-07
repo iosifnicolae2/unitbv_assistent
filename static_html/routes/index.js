@@ -54,7 +54,6 @@ router.get('/webhook', function (req, res) {
               user_setups.push({id:senderID,step:0});
                 return  setup_user(senderID);
               }else{
-                event.message = payload;
                 receivedMessage(event);
               }
             }
@@ -78,8 +77,8 @@ router.get('/webhook', function (req, res) {
   var senderID = event.sender.id;
   var recipientID = event.recipient.id;
   var timeOfMessage = event.timestamp;
-  var message = event.message;
-
+  var message = event.message||{text:event.postback.payload};
+// console.log("process message ",event)
   // console.log("Received message for user %d and page %d at %d with message:",
   //   senderID, recipientID, timeOfMessage);
   // console.log(JSON.stringify(message));
@@ -100,7 +99,7 @@ if(u>=0){
 
 console.log(" getStudentFb: ",senderID)
 student.getStudentFb(senderID,function(err,user){
-  console.log("Getting user.. ");
+ // console.log("Getting user.. ",user);
   if(user==null){
     console.log("User is NULL ",senderID);
     user_setups.push({id:senderID,step:0});
