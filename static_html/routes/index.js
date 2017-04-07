@@ -44,7 +44,7 @@ router.get('/webhook', function (req, res) {
         entry.messaging.forEach(function(event) {
           if(event)
           if (event.message&&!event.message.is_echo) {
-            console.log("Message received:  ",event);
+           // console.log("Message received:  ",event);
             receivedMessage(event);
           } else {
             if(event.postback){
@@ -54,11 +54,11 @@ router.get('/webhook', function (req, res) {
               user_setups.push({id:senderID,step:0});
                 return  setup_user(senderID);
               }else{
-                receivedMessage(event);
+                return receivedMessage(event);
               }
             }
 
-            console.log("Webhook received unknown event: ", event);
+           // console.log("Webhook received unknown event: ", event);
           }
         });
       });
@@ -287,6 +287,7 @@ function updateWeather(c,recipientId,day){
   }, function (error, response, body) {
     if (!error && response.statusCode == 200) {
       weather_data = JSON.parse(body);
+      console.log(weather_data)
       latest_update_weather = new Date();
       c(false,recipientId,day);
     } else {
@@ -297,15 +298,21 @@ function updateWeather(c,recipientId,day){
 
 
 var sendWeather_next = function(err,recipientId,day){
-
+if(err) console.error(err); else console.log("weather ok")
 let ddd = day;
-  var today = new Date(),is_today = false;
-  console.log("today",today);
+  var today = new Date(),is_today = false,one_week = 0;
   if(today.getDay()==day){
     is_today = true;
+  }else if(today.getDay()<day){
+    one_week = 0;
+  }else{
+    one_week = 7;
   }
-  today.setDate(today.getDate() - today.getDay() + day );
+
+
+  today.setDate(today.getDate() + day - today.getDay() + one_week);
   day = today.getUTCDate();
+  console.log("today",today,day);
   // console.log("today",today,day);
       if(err)
       console.log("Error get weather api: ",err);
@@ -323,10 +330,10 @@ let ddd = day;
           //TODO ar trebui ca pentru maine sa incrementez ziua dar sa verifica daca e la sfarsit de luna..
         //  console.log(value)
           if(wh.date.day==day){
-            //console.log("-------------found simpleforecast.forecastday",wh);
+            console.log("-------------found simpleforecast.forecastday",wh);
               todayW.txt_forecast.forecastday.forEach(function(vv){
-                if(vv.period == wh.period){
-                  //console.log("--------------------------found txt_forecast.forecastday",vv);
+                if(vv.period == wh.period*2-2||vv.period == wh.period*2-1){
+                  console.log("--------------------------found txt_forecast.forecastday",vv);
                   vremea+="Vremea "+vv.title+": "+  wh.low.celsius+" - "+wh.high.celsius+" °C\n"+
                   vv.fcttext_metric+"\n\n";
 
@@ -338,7 +345,8 @@ let ddd = day;
 
         },this)
 
-
+          if(vremea.length==0)
+          vremea = "Nu avem date disponibile pentru aceasta zi";
 
 
         var messageData = {
@@ -364,11 +372,7 @@ let ddd = day;
 function sendWeatherMessage(recipientId,messageText, user) {
   var zi = (new Date()).getDay();
   if(messageText){
-    var zi_d = getDay(messageText);
-    if(zi_d<zi){
-      saptamana_para=!saptamana_para;
-    }
-    zi = zi_d;
+    zi = getDay(messageText);
   }
 
   if(latest_update_weather==null||((new Date()).getHours()-latest_update_weather.getHours())>2){
@@ -394,15 +398,15 @@ function sendOrarMessage(recipientId, messageText ,user,welcome_message) {
   var dif2 = date-sem2_2;
 
 
-  console.log("dif1: ",dif1,"dif2: ",dif2,date,new Date(dif2));
+  //console.log("dif1: ",dif1,"dif2: ",dif2,date,new Date(dif2));
   if(dif2<0){
     //sem2_1
     //TODO vezi ce e prima saptamana de dupa vacanta, aici cred ca se schimba, avem vacanta o saptamana..
       saptamana_para = getWeekNumber(date)%2==0;
-      console.log("Inainte de vacanta ",saptamana_para,getWeekNumber(date));
+     // console.log("Inainte de vacanta ",saptamana_para,getWeekNumber(date));
   }else{
     saptamana_para = getWeekNumber(date)%2==1;
-    console.log("Dupa de vacanta ",saptamana_para,getWeekNumber(date));
+  //  console.log("Dupa de vacanta ",saptamana_para,getWeekNumber(date));
 
   }
 
@@ -416,7 +420,7 @@ var orar_string = 'Orarul dumneavoastra de astazi este: \n' ;
     var zi_d = getDay(messageText);
     if(zi_d<zi){
       saptamana_para=!saptamana_para;
-      console.log("Afisam pentru saptamna urmatoare.")
+     // console.log("Afisam pentru saptamna urmatoare.")
     }
     zi = zi_d;
     orar_string = 'Orarul dumneavoastra din ziua de '+zile_string[zi]+' este:\n';
@@ -662,15 +666,15 @@ function setup_user(recipientId,step = 0,u=null,value = null) {
           year = (zz.getYear() % 10)- user_setups[u].an+1;
         }
 
-        console.log("default setup completed",user_setups[u]);
+        //console.log("default setup completed",user_setups[u]);
 
         user_setups[u].grupa = "4"+user_setups[u].studiu+"F"+user_setups[u].departament+year+user_setups[u].grupa+user_setups[u].semigrupa.toUpperCase();
-        console.log("default setup completed2",user_setups[u]);
+       // console.log("default setup completed2",user_setups[u]);
 
       student.update_user(user_setups[u],update_user_callback);
-      console.log("user_setups initial",user_setups);
+      //console.log("user_setups initial",user_setups);
       user_setups.splice(u, 1);
-      console.log("user_setups final",user_setups);
+      //console.log("user_setups final",user_setups);
       break;
   }
 
@@ -725,7 +729,7 @@ function sendTextMessage(recipientId, messageText,quick_replies = undefined) {
       quick_replies:quick_replies
     }
   };
-  console.log("quick_replies",messageData.message)
+ // console.log("quick_replies",messageData.message)
   callSendAPI(messageData);
 }
 
