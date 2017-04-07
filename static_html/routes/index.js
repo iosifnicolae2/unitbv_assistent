@@ -53,6 +53,9 @@ router.get('/webhook', function (req, res) {
               let senderID = event.sender.id;
               user_setups.push({id:senderID,step:0});
                 return  setup_user(senderID);
+              }else{
+                event.message = payload;
+                receivedMessage(event);
               }
             }
 
